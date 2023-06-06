@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video Trend Prediction</title>
+    <style>
+        body {
+            background-color: #f7f7f7;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 40px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-top: 20px;
+            color: #555;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background-color: #f7f7f7;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            color: #333;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background-color: #4CAF50;
+            color: #fff;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Video Trend Prediction</h1>
+    <div class="container">
+        <form action="/predict" method="POST">
+            <label for="video_url">Enter YouTube Video URL:</label>
+            <input type="text" id="video_url" name="video_url" placeholder="Example: https://www.youtube.com/watch?v=VIDEO_ID">
+
+            <input type="submit" value="Predict">
+        </form>
+    </div>
+</body>
+</html>

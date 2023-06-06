@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prediction Result</title>
+    <style>
+        body {
+            background-color: #f7f7f7;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 40px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        p {
+            margin-top: 20px;
+            color: #333;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .success {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .failure {
+            background-color: #F44336;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prediction Result</h1>
+    <div class="container">
+        <p class="{{ result }}">{{ result }}</p>
+    </div>
+</body>
+</html>
