@@ -4,20 +4,9 @@ from urllib.parse import urlparse, parse_qs
 from preprocessText import preprocess
 from googleapiclient.discovery import build
 import isodate
+import os
 
-api_keys = ['AIzaSyC4hp-RHBw5uY4NcthYw-A2fqYyrG22kaE',
-    'AIzaSyC7KzwigUsNJ4KNvqGfPqXVK9QcDBsKU78',
-    'AIzaSyDEPBCb1PhEaYHuBgzW6D5-ldTHUCowuq4',
-    'AIzaSyD-LN8Z7xG8OHtMQ89GRDvIaRQwkVHzfEo',
-    'AIzaSyCW5J_uI37UPmq3mJVAhVdWNdGSMAMg5tI',
-    'AIzaSyC8VVO0DhDY91lfyqqaUW85VKriqBiahBA',
-    'AIzaSyDC744JL3Xa3eORSxORoxKpunKFPPMGb3Y',
-    'AIzaSyA-DwJmtgWFO-I-Dwv1hcISJKXGDjbpZok',
-    'AIzaSyDC744JL3Xa3eORSxORoxKpunKFPPMGb3Y',
-    'AIzaSyD74KqDih_2AyOIJV-HaIvU9DdUOIyRONs',
-    'AIzaSyALgq5vR27iGsuFuLiz-Ry4NGy6E-L1PUY',
-    'AIzaSyC4hp-RHBw5uY4NcthYw-A2fqYyrG22kaE']
-    
+api_keys = os.environ.get('API_KEY')
 current_key_index = 0  # Declare current_key_index as a global variable
 
 def get_video_id(url):
@@ -85,7 +74,7 @@ def get_metadata(url):
         df['cleanTitle'] = df['cleanTitle'].apply(lambda x: ' '.join(x))
         df['titleLength'] = df['title'].apply(lambda x: len(x))
         df['descriptionLength'] = df['description'].apply(lambda x: len(x))
-
+        df['thumbnail_link'] = df['thumbnail_link'].str.replace('default.jpg', 'maxresdefault.jpg')
         return df
     else: 
         return 0

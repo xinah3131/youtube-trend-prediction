@@ -6,7 +6,8 @@ from apiSearch import get_metadata
 import base64
 import requests
 # Load the model
-model = joblib.load('85pct.pkl')
+
+model = joblib.load(r'C:\Users\LEGION\Desktop\MMU\Data Science Fundamental\Project\Prediction of Video\85pct.pkl')
 
 # Define the categories
 categories = {
@@ -35,25 +36,24 @@ def main():
     st.set_page_config(layout="wide")
     st.markdown(
         f"""
-        <head>
-        <!-- basic -->
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <!-- mobile metas -->
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="viewport" content="initial-scale=1, maximum-scale=1">
-        <!-- site metas -->
-        
-        </head>
+      
         <style>
+            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=YouTube+Sans&display=swap');
+            html, body, [class*="css"]  {{
+			    font-family: 'Roboto', sans-serif;
+             
+			}}
             [data-testid="stAppViewContainer"] > .main {{
-            background-color : white;
-            background-size: 180%;
-            background-position: top left;
-            background-repeat: no-repeat;
-            background-attachment: local;
+                background-color : white;
+            
+           
             }}
-    
+            p{{
+                font-family: 'Roboto', sans-serif;
+                text-weight: bold;
+                font-size: 25px;
+            }}
             body{{
                 display: flex;
                 justify-content: center;
@@ -79,6 +79,11 @@ def main():
                 border: 2px solid #d72324;
                 padding: 10px;
             }}
+            .stButton > button:hover {{
+                background-color: white;
+                color:#d72324;
+            }}
+           
         </style>
         """,
         unsafe_allow_html=True
@@ -87,7 +92,9 @@ def main():
     st.markdown("<h1>YouTube Trend Prediction</h1>", unsafe_allow_html=True)
     #https://www.freepnglogos.com/uploads/youtube-play-red-logo-png-transparent-background-6.png
     # st.write("Enter the video details below:")
-    
+
+    # Define a boolean flag variable to track prediction status
+    prediction_done = False
     tab1, tab2 = st.tabs(["Predict", "Test"])
     # Input fields
     with tab1:
@@ -109,7 +116,7 @@ def main():
                         if getThumbnailUrl is not None:
                             picture = get_picture_from_url(getThumbnailUrl)
                             if picture:
-                                st.image(picture, caption='Uploaded Picture', use_column_width=True)
+                                st.image(picture, caption='Thumbnail captured',width = 400, channels="BGR")
             with col2:
                 title = st.text_input("Title", placeholder="Enter a video title",value=getTitle)
                 duration = st.number_input("Duration (in minutes)", min_value=0.0, value=getDuration)
@@ -118,7 +125,7 @@ def main():
             with col3:
                 picture = st.file_uploader("Upload Picture", type=["jpg", "jpeg", "png"])
                 if picture is not None:
-                    st.picture(picture, use_column_width=True)
+                    st.picture(picture,caption='Thumbnail Uploaded',width = 400, channels="BGR")
     # Convert category to category ID
         categoryId = categories[category]
 
@@ -137,6 +144,7 @@ def main():
         
                 else:
                     prediction = predict_trend(title, duration, categoryId)
+                    prediction_done = True  # Set the prediction flag to True
                     if prediction[0] == 1:
                         st.success("This video is predicted to be a trend!")
                         st.markdown("![Alt Text](https://media.tenor.com/Cyi2zT7wcmcAAAAj/pentol-gif-eak.gif)")
@@ -144,7 +152,9 @@ def main():
                         st.info("This video is predicted not to be a trend.")
                         st.markdown("![Alt Text](https://media.tenor.com/VYKtkKnHaUcAAAAj/quby-cute.gif)")
             
-
+        if prediction_done:
+            with tab2:
+                st.write("Tab 2 content goes here...")
 
 def get_picture_from_url(url):
     try:
