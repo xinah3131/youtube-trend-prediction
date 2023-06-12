@@ -6,8 +6,28 @@ from googleapiclient.discovery import build
 import isodate
 import os
 
-api_keys = os.environ.get('API_KEY')
-current_key_index = 0  # Declare current_key_index as a global variable
+apiKeys = os.environ.get('API_KEY')
+class YouTubeService:
+    def __init__(self, api_key):
+        self.api_key = api_key
+        self.service = build('youtube', 'v3', developerKey=api_key)
+    
+    def switch_api_key(self):
+        current_key_index = apiKeys.index(self.api_key)
+        next_key_index = (current_key_index + 1) % len(apiKeys)
+        self.api_key = apiKeys[next_key_index]
+        self.service = build('youtube', 'v3', developerKey=self.api_key)
+
+# Initialize the YouTube service with the first API key
+youtube = YouTubeService(apiKeys[2])
+
+def get_next_api_key():
+    current_key_index = apiKeys.index(youtube.api_key)
+    next_key_index = (current_key_index + 1) % len(apiKeys)
+    youtube.switch_api_key()
+    return apiKeys[next_key_index]
+
+
 
 def get_video_id(url):
     video_id = None
@@ -21,10 +41,6 @@ def get_video_id(url):
             video_id = query_params['v'][0]
     return video_id
 
-def get_next_api_key():
-    global current_key_index
-    current_key_index = (current_key_index + 1) % len(api_keys)
-    return api_keys[current_key_index]
 
 def get_video_metadata(video_id):
     try:
@@ -43,6 +59,10 @@ def get_video_metadata(video_id):
         # Extract the relevant metadata
         if 'items' in response and len(response['items']) > 0:
             video = response['items'][0]
+            try:
+                comments = video['statistics']['commentCount']
+            except KeyError:
+                comments = 0
             metadata = {
                 'title': video['snippet']['title'],
                 'description': video['snippet']['description'],
@@ -51,7 +71,7 @@ def get_video_metadata(video_id):
                 'duration': video['contentDetails']['duration'],
                 'views': video['statistics']['viewCount'],
                 'likes': video['statistics']['likeCount'],
-                'comments': video['statistics']['commentCount'],
+                'comments': comments,
                 'category_id': video['snippet']['categoryId'],
                 'thumbnail_link': video['snippet']['thumbnails']['default']['url']
             }
@@ -66,6 +86,7 @@ def get_metadata(url):
     # Set up the YouTube Data API client
     video_id = get_video_id(url)
     metadata = get_video_metadata(video_id)
+  
     if metadata is not None:
         # Create a DataFrame from the metadata
         df = pd.DataFrame([metadata])
@@ -78,5 +99,64 @@ def get_metadata(url):
         return df
     else: 
         return 0
-    
+
+def get_trending_videos(country_code):
+    try:
+        api_key = get_next_api_key()  # Replace with your own YouTube Data API key
+        youtube = build('youtube', 'v3', developerKey=api_key)
+
+        try:
+            response = youtube.videos().list(
+                part='snippet,contentDetails,statistics',
+                chart='mostPopular',
+                regionCode=country_code,
+                maxResults=10  # Adjust the number of videos you want to retrieve
+            ).execute()
+
+            trending_videos = []
+            for item in response['items']:
+                title = item['snippet']['title']
+                description = item['snippet']['description'],
+                channel_title = item['snippet']['channelTitle']
+                publish_date = item['snippet']['publishedAt']
+                duration = item['contentDetails']['duration']                
+                views = item['statistics']['viewCount']
+                try:
+                    likes = item['statistics']['likeCount']
+                except KeyError:
+                    likes = "Hidden!"
+                try:
+                    comments = item['statistics']['commentCount']
+                except KeyError:
+                    comments = "Hidden!"
+                category_id = item['snippet']['categoryId']
+                thumbnail_link = item['snippet']['thumbnails']['default']['url']
+                duration = isodate.parse_duration(duration)
+                duration = duration.total_seconds()
+                trending_videos.append({
+                    'title': title,
+                    'description':description,
+                    'channel_title': channel_title,
+                    'publish_date': publish_date,
+                    'duration': duration,
+                    'views': views,
+                    'likes': likes,
+                    'comments': comments,
+                    'category_id': category_id,
+                    'thumbnail_link': thumbnail_link
+                })
+            df = pd.DataFrame(trending_videos)
+            df['views'] = df['views'].astype(int)
+            df['likes'] = df['likes'].astype(str)
+            df['comments'] = df['comments'].astype(str)
+            df['category_id'] = df['category_id'].astype(int)
+            df['thumbnail_link'] = df['thumbnail_link'].str.replace('default.jpg', 'maxresdefault.jpg')
+            return df
+
+        except Exception as e:
+            print('An error occurred:', str(e))
+            return None
+        
+    except Exception as e:
+        print("An error occurred:", str(e))
 
